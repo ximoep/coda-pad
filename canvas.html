@@ -1,44 +1,84 @@
-<script>
-  const canvas = document.getElementById("signature-pad");
-  const signaturePad = new SignaturePad(canvas);
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Signature Pad</title>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin-top: 50px;
+      }
+      canvas {
+        border: 1px solid black;
+        display: block;
+        margin: 20px auto;
+      }
+      button {
+        margin: 10px;
+        padding: 10px 20px;
+        font-size: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Signature Pad</h1>
+    <canvas id="signature-pad" width="500" height="200"></canvas>
+    <br />
+    <button id="clear">Clear</button>
+    <button id="save">Save</button>
+    <script>
+      // Inicializar el lienzo y la biblioteca SignaturePad
+      const canvas = document.getElementById("signature-pad");
+      const signaturePad = new SignaturePad(canvas);
 
-  // Obtener parámetros de la URL
-  const params = new URLSearchParams(window.location.search);
-  const webhookUrl = "http://localhost:5678/webhook/save-signature"; // Cambia esto por tu URL de n8n
-  const rowId = params.get("rowId");
-
-  document.getElementById("clear").addEventListener("click", () => {
-    signaturePad.clear();
-  });
-
-  document.getElementById("save").addEventListener("click", async () => {
-    if (signaturePad.isEmpty()) {
-      alert("Please draw your signature first.");
-      return;
-    }
-
-    const dataUrl = signaturePad.toDataURL();
-
-    // Enviar la firma al webhook
-    try {
-      const response = await fetch(webhookUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          rowId: rowId,
-          signatureData: dataUrl,
-        }),
+      // Limpiar el lienzo
+      document.getElementById("clear").addEventListener("click", () => {
+        signaturePad.clear();
       });
 
-      if (response.ok) {
-        alert("Signature saved successfully!");
-      } else {
-        alert("Failed to save signature.");
-      }
-    } catch (error) {
-      alert("Error sending signature: " + error.message);
-    }
-  });
-</script>
+      // Guardar la firma
+      document.getElementById("save").addEventListener("click", async () => {
+        if (signaturePad.isEmpty()) {
+          alert("Please draw your signature first.");
+          return;
+        }
+
+        // Obtener los parámetros de la URL
+        const params = new URLSearchParams(window.location.search);
+        const webhookUrl = params.get("webhookUrl");
+        const rowId = params.get("rowId");
+
+        if (!webhookUrl || !rowId) {
+          alert("Missing parameters in the URL.");
+          return;
+        }
+
+        // Convertir la firma a base64
+        const dataUrl = signaturePad.toDataURL();
+
+        try {
+          // Enviar la firma al webhook
+          const response = await fetch(webhookUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              rowId: rowId,
+              signatureData: dataUrl,
+            }),
+          });
+
+          if (response.ok) {
+            alert("Signature saved successfully!");
+          } else {
+            alert("Failed to save signature.");
+          }
+        } catch (error) {
+          alert("Error sending signature: " + error.message);
+        }
+      });
+    </script>
+  </body>
+</html>
