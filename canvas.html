@@ -1,13 +1,10 @@
-<!DOCTYPE html>
-<html>
-  <head>
 <script>
   const canvas = document.getElementById("signature-pad");
   const signaturePad = new SignaturePad(canvas);
 
   // Obtener parámetros de la URL
   const params = new URLSearchParams(window.location.search);
-  const webhookUrl = params.get("webhookUrl");
+  const webhookUrl = "https://<tu-n8n-url>/webhook/save-signature"; // Cambia esto por tu URL de n8n
   const rowId = params.get("rowId");
 
   document.getElementById("clear").addEventListener("click", () => {
@@ -45,6 +42,3 @@
     }
   });
 </script>
-
-  </body>
-</html>
