@@ -45,7 +45,7 @@
         const rowId = params.get("rowId");
         const docId = params.get("docId");
         const tableId = params.get("tableId");
-        const columnId = params.get("columnId");
+        const columnId = params.get("columnId"); // Columna donde se guarda la firma
         const apiKey = params.get("apiKey");
 
         if (!rowId || !docId || !tableId || !columnId || !apiKey) {
@@ -68,17 +68,13 @@
                 {
                   cells: [
                     {
-                      column: columnId,
-                      value: dataUrl, // Guardar con prefijo
-                    },
-                    {
-                      column: "c-rqqk55XVky", // ID de la columna RowID
-                      value: rowId,
+                      column: columnId, // Firma se guarda en esta columna
+                      value: dataUrl, // Valor de la firma
                     },
                   ],
                 },
               ],
-              keyColumns: ["c-rqqk55XVky"], // Usar la columna RowID como clave para upsert
+              keyColumns: ["c-rqqk55XVky"], // Usar la columna rowId como filtro
             }),
           });
 
