@@ -61,25 +61,20 @@
         }
 
         const dataUrl = signaturePad.toDataURL(); // Incluye prefijo completo
-        const codaUrl = `https://coda.io/apis/v1/docs/${docId}/tables/${tableId}/rows`;
+        const codaUrl = `https://coda.io/apis/v1/docs/${docId}/tables/${tableId}/rows/${rowId}`;
 
         try {
           const response = await fetch(codaUrl, {
-            method: "POST",
+            method: "PUT", // Usa PUT para actualizar la fila directamente
             headers: {
               "Authorization": `Bearer ${apiKey}`,
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              rows: [
+              cells: [
                 {
-                  cells: [
-                    {
-                      column: columnId, // Donde se guarda la firma
-                      value: dataUrl,
-                    },
-                  ],
-                  key: { column: "c-rqqk55XVky", value: rowId }, // Filtro por rowId
+                  column: columnId, // Donde se guarda la firma
+                  value: dataUrl, // Valor de la firma codificada en base64
                 },
               ],
             }),
