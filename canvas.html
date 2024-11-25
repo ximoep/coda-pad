@@ -28,7 +28,7 @@
     <button id="clear">Clear</button>
     <button id="save">Save</button>
     <script>
-      // Inicializar el lienzo y la biblioteca SignaturePad
+      // Inicializar el lienzo y SignaturePad
       const canvas = document.getElementById("signature-pad");
       const signaturePad = new SignaturePad(canvas);
 
@@ -37,46 +37,59 @@
         signaturePad.clear();
       });
 
-      // Guardar la firma
+      // Guardar la firma en Coda
       document.getElementById("save").addEventListener("click", async () => {
         if (signaturePad.isEmpty()) {
           alert("Please draw your signature first.");
           return;
         }
 
-        // Obtener los parámetros de la URL
-        const params = new URLSearchParams(window.location.search);
-        const webhookUrl = params.get("webhookUrl");
-        const rowId = params.get("rowId");
-
-        if (!webhookUrl || !rowId) {
-          alert("Missing parameters in the URL.");
-          return;
-        }
-
         // Convertir la firma a base64
         const dataUrl = signaturePad.toDataURL();
 
+        // Parámetros de la URL
+        const params = new URLSearchParams(window.location.search);
+        const rowId = params.get("rowId");
+
+        // Verificar que el rowId está presente
+        if (!rowId) {
+          alert("Missing rowId parameter in the URL.");
+          return;
+        }
+
+        // Datos de la API de Coda
+        const docId = "fwUsIkYL3Q";
+        const tableId = "grid-7QIOOy-KrT";
+        const columnId = "c-NQebCzvdBD";
+        const apiKey = "c2f0066d-bba8-456a-8a80-4a3838b8a1b1";
+
+        // Construir la URL de la API de Coda
+        const codaUrl = `https://coda.io/apis/v1/docs/${docId}/tables/${tableId}/rows`;
+
         try {
-          // Enviar la firma al webhook
-          const response = await fetch(webhookUrl, {
+          // Realizar la solicitud POST a la API de Coda
+          const response = await fetch(codaUrl, {
             method: "POST",
             headers: {
+              "Authorization": `Bearer ${apiKey}`,
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
               rowId: rowId,
-              signatureData: dataUrl,
+              values: {
+                [columnId]: dataUrl, // Guardar la firma en la columna correspondiente
+              },
             }),
           });
 
           if (response.ok) {
             alert("Signature saved successfully!");
           } else {
-            alert("Failed to save signature.");
+            const error = await response.json();
+            alert(`Failed to save signature: ${error.message}`);
           }
         } catch (error) {
-          alert("Error sending signature: " + error.message);
+          alert(`Error sending signature: ${error.message}`);
         }
       });
     </script>
