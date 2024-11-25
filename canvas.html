@@ -31,19 +31,16 @@
       const canvas = document.getElementById("signature-pad");
       const signaturePad = new SignaturePad(canvas);
 
-      // Limpiar el lienzo
       document.getElementById("clear").addEventListener("click", () => {
         signaturePad.clear();
       });
 
-      // Guardar la firma en Coda
       document.getElementById("save").addEventListener("click", async () => {
         if (signaturePad.isEmpty()) {
           alert("Please draw your signature first.");
           return;
         }
 
-        // Obtener los parámetros de la URL
         const params = new URLSearchParams(window.location.search);
         const rowId = params.get("rowId");
         const docId = params.get("docId");
@@ -51,20 +48,15 @@
         const columnId = params.get("columnId");
         const apiKey = params.get("apiKey");
 
-        // Verificar que todos los parámetros están presentes
         if (!rowId || !docId || !tableId || !columnId || !apiKey) {
           alert("Missing required parameters in the URL.");
           return;
         }
 
-        // Convertir la firma a base64
         const dataUrl = signaturePad.toDataURL();
-
-        // Construir la URL de la API de Coda
         const codaUrl = `https://coda.io/apis/v1/docs/${docId}/tables/${tableId}/rows`;
 
         try {
-          // Realizar la solicitud POST a la API de Coda
           const response = await fetch(codaUrl, {
             method: "POST",
             headers: {
@@ -74,15 +66,19 @@
             body: JSON.stringify({
               rows: [
                 {
-                  id: rowId,
                   cells: [
                     {
                       column: columnId,
-                      value: dataUrl, // Guardar la firma en la columna correspondiente
+                      value: dataUrl,
+                    },
+                    {
+                      column: "c-rqqk55XVky", // ID de la columna RowID
+                      value: rowId,
                     },
                   ],
                 },
               ],
+              keyColumns: ["c-rqqk55XVky"], // Usar la columna RowID como clave para upsert
             }),
           });
 
