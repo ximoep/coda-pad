@@ -45,15 +45,22 @@
         const rowId = params.get("rowId");
         const docId = params.get("docId");
         const tableId = params.get("tableId");
-        const columnId = params.get("columnId"); // Columna donde se guarda la firma
+        const columnId = params.get("columnId"); // Columna para guardar la firma
         const apiKey = params.get("apiKey");
 
         if (!rowId || !docId || !tableId || !columnId || !apiKey) {
           alert("Missing required parameters in the URL.");
+          console.error("Missing parameters:", {
+            rowId,
+            docId,
+            tableId,
+            columnId,
+            apiKey,
+          });
           return;
         }
 
-        const dataUrl = signaturePad.toDataURL(); // Incluye el prefijo completo
+        const dataUrl = signaturePad.toDataURL(); // Incluye prefijo completo
         const codaUrl = `https://coda.io/apis/v1/docs/${docId}/tables/${tableId}/rows`;
 
         try {
@@ -68,13 +75,13 @@
                 {
                   cells: [
                     {
-                      column: columnId, // Firma se guarda en esta columna
-                      value: dataUrl, // Valor de la firma
+                      column: columnId, // Donde se guarda la firma
+                      value: dataUrl,
                     },
                   ],
+                  key: { column: "c-rqqk55XVky", value: rowId }, // Filtro por rowId
                 },
               ],
-              keyColumns: ["c-rqqk55XVky"], // Usar la columna rowId como filtro
             }),
           });
 
@@ -82,9 +89,11 @@
             alert("Signature saved successfully!");
           } else {
             const error = await response.json();
+            console.error("API Error:", error);
             alert(`Failed to save signature: ${error.message}`);
           }
         } catch (error) {
+          console.error("Error sending signature:", error);
           alert(`Error sending signature: ${error.message}`);
         }
       });
