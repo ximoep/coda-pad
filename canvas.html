@@ -53,7 +53,7 @@
           return;
         }
 
-        const dataUrl = signaturePad.toDataURL();
+        const dataUrl = signaturePad.toDataURL().replace(/^data:image\/png;base64,/, '');
         const codaUrl = `https://coda.io/apis/v1/docs/${docId}/tables/${tableId}/rows`;
 
         try {
