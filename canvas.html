@@ -28,7 +28,6 @@
     <button id="clear">Clear</button>
     <button id="save">Save</button>
     <script>
-      // Inicializar el lienzo y SignaturePad
       const canvas = document.getElementById("signature-pad");
       const signaturePad = new SignaturePad(canvas);
 
@@ -73,10 +72,17 @@
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              rowId: rowId,
-              values: {
-                [columnId]: dataUrl, // Guardar la firma en la columna correspondiente
-              },
+              rows: [
+                {
+                  id: rowId,
+                  cells: [
+                    {
+                      column: columnId,
+                      value: dataUrl, // Guardar la firma en la columna correspondiente
+                    },
+                  ],
+                },
+              ],
             }),
           });
 
