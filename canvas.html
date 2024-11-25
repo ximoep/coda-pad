@@ -44,24 +44,22 @@
           return;
         }
 
-        // Convertir la firma a base64
-        const dataUrl = signaturePad.toDataURL();
-
-        // Parámetros de la URL
+        // Obtener los parámetros de la URL
         const params = new URLSearchParams(window.location.search);
         const rowId = params.get("rowId");
+        const docId = params.get("docId");
+        const tableId = params.get("tableId");
+        const columnId = params.get("columnId");
+        const apiKey = params.get("apiKey");
 
-        // Verificar que el rowId está presente
-        if (!rowId) {
-          alert("Missing rowId parameter in the URL.");
+        // Verificar que todos los parámetros están presentes
+        if (!rowId || !docId || !tableId || !columnId || !apiKey) {
+          alert("Missing required parameters in the URL.");
           return;
         }
 
-        // Datos de la API de Coda
-        const docId = "fwUsIkYL3Q";
-        const tableId = "grid-7QIOOy-KrT";
-        const columnId = "c-NQebCzvdBD";
-        const apiKey = "c2f0066d-bba8-456a-8a80-4a3838b8a1b1";
+        // Convertir la firma a base64
+        const dataUrl = signaturePad.toDataURL();
 
         // Construir la URL de la API de Coda
         const codaUrl = `https://coda.io/apis/v1/docs/${docId}/tables/${tableId}/rows`;
